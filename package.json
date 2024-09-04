@@ -1,0 +1,11 @@
+{
+  "name": "todolist",
+  "version": "1.0.0",
+  "description": "Uma página para organizar tarefas e sequência de dias",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
