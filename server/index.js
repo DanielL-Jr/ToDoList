@@ -3,12 +3,19 @@ const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const lerTarefas = require("./database/tasks");
+const lerTarefas = require("../database/tasks");
 
 const app = express();
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "../public/html")));
 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/html/tarefas.html"));
+})
+
+
+// Retorna todas as tarefas de um user
 app.get("/tasks/:user_id", async (req, res) => {
   const { user_id } = req.params;
   const { data, error } = await lerTarefas(user_id);
