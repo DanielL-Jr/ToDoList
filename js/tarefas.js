@@ -13,7 +13,7 @@ function adicionarLinha(data) {
 
   let checkbox = document.createElement("input");
   checkbox.setAttribute("type", "checkbox");
-  checkbox.checked = data.feito;
+  checkbox.checked = data.feita;
   coluna1.appendChild(checkbox);
 
   coluna2.textContent = data.descricao;
@@ -31,7 +31,7 @@ function adicionarLinha(data) {
   coluna5.appendChild(action1);
   coluna5.appendChild(action2);
   linha.appendChild(coluna5);
-  if (data.feito) {
+  if (data.feita) {
     tabelaTarefasFeitas.appendChild(linha);
   } else {
     tabelaTarefasPedentes.appendChild(linha);
