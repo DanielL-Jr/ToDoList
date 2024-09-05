@@ -9,8 +9,8 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/tasks", async (req, res) => {
-  const { user_id } = req.body;
+app.get("/tasks/:user_id", async (req, res) => {
+  const { user_id } = req.params;
   const { data, error } = await lerTarefas(user_id);
   if (error) {
     res.status(500).send("Erro ao consultar tabela: ", error);
