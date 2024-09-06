@@ -1,6 +1,15 @@
 const tabelaTarefasPedentes = document.getElementById("tabelaTarefasPendentes");
 const tabelaTarefasFeitas = document.getElementById("tabelaTarefasFeitas");
 
+function formatarData(data) {
+  const date = new Date(data);
+
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+
+  return `${hours}:${minutes}`;
+} 
+
 function adicionarLinha(data) {
   let linha = document.createElement("tr");
   let coluna1 = document.createElement("td");
@@ -17,11 +26,11 @@ function adicionarLinha(data) {
   coluna1.appendChild(checkbox);
 
   coluna2.textContent = data.descricao;
-  coluna3.textContent = data.inicio;
-  coluna4.textContent = data.fim;
+  coluna3.textContent = formatarData(data.inicio);
+  coluna4.textContent = formatarData(data.fim);
 
-  action1.textContent = data.actions[0];
-  action2.textContent = data.actions[1];
+  action1.textContent = "Editar";
+  action2.textContent = "Excluir";
 
   linha.appendChild(coluna1);
   linha.appendChild(coluna2);
@@ -47,8 +56,10 @@ async function pegarDados() {
     }
   })
     .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
+    .then((dados) => {
+      dados.forEach((dado) => {
+        adicionarLinha(dado);
+      });
     })
     .catch((error) => {
       console.error("Erro: ", error);
