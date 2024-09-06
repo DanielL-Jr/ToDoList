@@ -8,7 +8,7 @@ const lerTarefas = async (user_id) => {
   if (consulta.error) {
     console.log("Erro ao consultar tarefas: ", consulta.error);
   } else {
-    console.log(consulta.data);
+    console.log("Consulta bem sucedida!");
   }
   return consulta;
 };
