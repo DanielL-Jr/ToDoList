@@ -4,7 +4,7 @@
   "description": "Uma página para organizar tarefas e sequência de dias",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "test": "nodemon server/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,5 +12,8 @@
     "@supabase/supabase-js": "^2.45.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
