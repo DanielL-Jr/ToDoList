@@ -37,4 +37,14 @@ app.patch("/tasks", async (req, res) => {
   }
 })
 
+app.delete("/tasks/:id", async (req, res) => {
+  const {id} = req.params;
+  const {error} = await tasks.deletarTarefa(id);
+  if(error){
+    res.status(500).send(`Erro ao deletar tarefa: ${error}`);
+  }else{
+    res.status(200).send(`Tarefa Deletada com Sucesso!`);
+  }
+})
+
 app.listen(8080, () => console.log("Rodando servidor na porta 8080"));

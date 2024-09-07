@@ -6,7 +6,7 @@ const lerTarefas = async (user_id) => {
     .select("id, feita, descricao, inicio, fim")
     .eq("user_id", user_id);
   if (consulta.error) {
-    console.log("Erro ao consultar tarefas: ", consulta.error);
+    console.error("Erro ao consultar tarefas: ", consulta.error);
   } else {
     console.log("Consulta bem sucedida!");
   }
@@ -21,11 +21,28 @@ const trocarEstado = async (estado, id) => {
     .update({ feita: estado })
     .eq("id", id);
   if (consulta.error) {
-    console.log("Erro ao atualizar a tarefa: ", consulta.error);
+    console.error("Erro ao atualizar a tarefa: ", consulta.error);
   } else {
     console.log("Tarefa atualizada com sucesso!");
   }
   return consulta;
 };
 
-module.exports = { lerTarefas, trocarEstado };
+const atualizarTarefa = async () => {
+
+}
+
+const deletarTarefa = async (id) => {
+  let consulta = await supabase.from("tasks").delete().eq("id", id);
+  if(consulta.error){
+    console.error("Erro ao deletar tarefa: ", consulta.error);
+  }else if(consulta.data){
+    console.log("Tarefa deletada com sucesso!");
+  }else{
+    console.log("Tarefa Não Existe");
+    consulta.error = "Tarefa Não Existe";
+  }
+  return consulta;
+}
+
+module.exports = { lerTarefas, trocarEstado, atualizarTarefa, deletarTarefa };
