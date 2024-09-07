@@ -7,7 +7,7 @@ formularioCadastro.addEventListener("submit", () => {
   cadastrarTarefa();
 });
 
-function pegarUserId(){
+function pegarUserId() {
   // Provisório, ainda não tem autenticação
   return 2;
 }
@@ -44,6 +44,22 @@ async function cadastrarTarefa() {
   await pegarDados();
 }
 
+async function deletarTarefa(id) {
+  await fetch(`/tasks/${id}`, {
+    method: "DELETE",
+    headers: {},
+  })
+    .then((response) => response.text())
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  limparTabelas();
+  await pegarDados();
+}
+
 function formatarData(data) {
   const date = new Date(data);
 
@@ -68,7 +84,7 @@ function adicionarLinha(tarefa) {
   // Preenchendo as informações de cada coluna
   let checkbox = document.createElement("input");
   checkbox.setAttribute("type", "checkbox");
-  checkbox.setAttribute("id", tarefa.id);
+  checkbox.setAttribute("class", tarefa.id);
   checkbox.checked = tarefa.feita;
   checkbox.addEventListener("change", () => trocarEstado(checkbox));
   coluna1.appendChild(checkbox);
@@ -78,7 +94,12 @@ function adicionarLinha(tarefa) {
   coluna4.textContent = formatarData(tarefa.fim);
 
   action1.textContent = "Editar";
+
   action2.textContent = "Excluir";
+  action2.setAttribute("class", tarefa.id);
+  action2.addEventListener("click", () => {
+    deletarTarefa(action2.className);
+  });
 
   // Montando a linha
   linha.appendChild(coluna1);
