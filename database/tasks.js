@@ -46,7 +46,7 @@ const atualizarTarefa = async (tarefa) => {
   } else {
     consulta.error = "A tarefa não existe.";
   }
-  return consulta
+  return consulta;
 };
 
 const deletarTarefa = async (id) => {
@@ -62,4 +62,30 @@ const deletarTarefa = async (id) => {
   return consulta;
 };
 
-module.exports = { lerTarefas, trocarEstado, atualizarTarefa, deletarTarefa };
+const criarTarefa = async (dados) => {
+  let consulta = await supabase
+    .from("tasks")
+    .insert([
+      {
+        user_id: dados.user_id,
+        inicio: dados.inicio,
+        fim: dados.fim,
+        descricao: dados.descricao,
+        feita: dados.status,
+      },
+    ]);
+  if(consulta.error){
+    console.error("Erro ao cadastrar nova tarefa: ", consulta.error);
+  }else{
+    console.log("Nova Tarefa Cadastrada com Sucesso!");
+  }
+  return consulta;
+};
+
+module.exports = {
+  criarTarefa,
+  lerTarefas,
+  trocarEstado,
+  atualizarTarefa,
+  deletarTarefa,
+};
