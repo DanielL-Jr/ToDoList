@@ -1,0 +1,14 @@
+#container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  #tabelas {
+    width: 60%; /* Ajuste a largura conforme necessário */
+    margin-right: 20px;
+  }
+  
+  #divFormAdicionarTarefa {
+    width: 40%; /* Ajuste a largura conforme necessário */
+  }
+  
