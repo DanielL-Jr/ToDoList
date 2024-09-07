@@ -50,7 +50,7 @@ const atualizarTarefa = async (tarefa) => {
 };
 
 const deletarTarefa = async (id) => {
-  let consulta = await supabase.from("tasks").delete().eq("id", id);
+  let consulta = await supabase.from("tasks").delete().eq("id", id).select();
   if (consulta.error) {
     console.error("Erro ao deletar tarefa: ", consulta.error);
   } else if (consulta.data) {

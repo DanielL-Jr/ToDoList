@@ -1,6 +1,49 @@
 const tabelaTarefasPedentes = document.getElementById("tabelaTarefasPendentes");
 const tabelaTarefasFeitas = document.getElementById("tabelaTarefasFeitas");
 
+const formularioCadastro = document.getElementById("formAdicionarTarefa");
+formularioCadastro.addEventListener("submit", () => {
+  event.preventDefault();
+  cadastrarTarefa();
+});
+
+function pegarUserId(){
+  // Provisório, ainda não tem autenticação
+  return 2;
+}
+
+async function cadastrarTarefa() {
+  const descricao = document.getElementById("cadastroDescricao");
+  const inicio = document.getElementById("cadastroInicio");
+  const fim = document.getElementById("cadastroFim");
+  const status = document.getElementById("cadastroStatus");
+  const user_id = pegarUserId();
+
+  const dados = {
+    user_id: user_id,
+    descricao: descricao.value,
+    inicio: inicio.value,
+    fim: fim.value,
+    status: status.checked,
+  };
+  await fetch("/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dados),
+  })
+    .then((response) => response.text())
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  limparTabelas();
+  await pegarDados();
+}
+
 function formatarData(data) {
   const date = new Date(data);
 
