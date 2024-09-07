@@ -3,29 +3,73 @@
   <head>
     <meta charset="UTF-8" />
     <title>Tarefas</title>
+    <link rel="stylesheet" href="../css/tarefas.css" />
   </head>
   <body>
     <h1>Tarefas</h1>
-    <h2>Pendentes</h2>
-    <table border="3" id="tabelaTarefasPendentes">
-      <tr>
-        <th>Feita</th>
-        <th>Descrição</th>
-        <th>Início</th>
-        <th>Fim</th>
-        <th>Ações</th>
-      </tr>
-    </table>
-    <h2>Terminadas</h2>
-    <table border="3" id="tabelaTarefasFeitas">
-      <tr>
-        <th>Feita</th>
-        <th>Descrição</th>
-        <th>Início</th>
-        <th>Fim</th>
-        <th>Ações</th>
-      </tr>
-    </table>
+    <div id="container">
+      <div id="tabelas">
+        <h2>Pendentes</h2>
+        <table border="3" id="tabelaTarefasPendentes">
+          <tr>
+            <th>Feita</th>
+            <th>Descrição</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Ações</th>
+          </tr>
+        </table>
+        <h2>Terminadas</h2>
+        <table border="3" id="tabelaTarefasFeitas">
+          <tr>
+            <th>Feita</th>
+            <th>Descrição</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Ações</th>
+          </tr>
+        </table>
+      </div>
+      <div id="divFormAdicionarTarefa">
+        <h2>Cadastrar Tarefa</h2>
+        <form>
+          <p>
+            Descrição: <br />
+            <input
+              type="text"
+              name="cadastroDescricao"
+              id="cadastroDescricao"
+            />
+          </p>
+          <p>
+            Início: <br />
+            <input
+              type="datetime-local"
+              name="cadastrarInicio"
+              id="cadastrarInicio"
+            />
+          </p>
+          <p>
+            Fim: <br />
+            <input
+              type="datetime-local"
+              name="cadastrarFim"
+              id="cadastrarFim"
+            />
+          </p>
+          <p>
+            Feita:
+            <input
+              type="checkbox"
+              name="cadastrarEstado"
+              id="cadastrarEstado"
+            />
+          </p>
+          <input type="submit" value="Adicionar" />
+        </form>
+      </div>
+    </div>
+
     <script src="../js/tarefas.js"></script>
   </body>
 </html>
