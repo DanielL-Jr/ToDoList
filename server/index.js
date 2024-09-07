@@ -27,6 +27,22 @@ app.get("/tasks/:user_id", async (req, res) => {
   }
 });
 
+app.put("/tasks", async (req, res) => {
+  const tarefa = {
+    id: req.body.id,
+    inicio: req.body.inicio,
+    fim: req.body.fim,
+    descricao: req.body.descricao,
+    status: req.body.status
+  }
+  const {error} = await tasks.atualizarTarefa(tarefa);
+  if(error){
+    res.status(500).send(`Erro ao atualizar tarefa: ${error}`);
+  }else{
+    res.status(200).send("Tarefa Atualizada com Sucesso!");
+  }
+})
+
 app.patch("/tasks", async (req, res) => {
   const {estado, id} = req.body;
   const {error} = await tasks.trocarEstado(estado, id);
