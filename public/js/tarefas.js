@@ -26,9 +26,6 @@ async function cadastrarTarefa() {
   const inicioUTC = inicioDate.toISOString();
   const fimUTC = fimDate.toISOString();
 
-  console.log(inicioUTC);
-  console.log(fimUTC);
-
   const dados = {
     user_id: user_id,
     descricao: descricao.value,
@@ -82,6 +79,46 @@ function formatarData(data) {
   return `${hours}:${minutes}`;
 }
 
+function calcularDuracao(inicio, fim) {
+  // Cria objetos Date para as duas datas fornecidas
+  const data1Obj = new Date(inicio);
+  const data2Obj = new Date(fim);
+
+  // Obtém os timestamps das datas
+  const timestamp1 = data1Obj.getTime();
+  const timestamp2 = data2Obj.getTime();
+
+  // Calcula a diferença em milissegundos
+  const diferencaMs = Math.abs(timestamp2 - timestamp1);
+
+  // Converte a diferença para diferentes unidades
+  const diferencaSegundos = Math.floor(diferencaMs / 1000);
+  const diferencaMinutos = Math.floor(diferencaSegundos / 60);
+  const diferencaHoras = Math.floor(diferencaMinutos / 60);
+  const diferencaDias = Math.floor(diferencaHoras / 24);
+
+  // Calcula o resto para cada unidade de tempo
+  const restoHoras = diferencaHoras % 24;
+  const restoMinutos = diferencaMinutos % 60;
+
+  // Cria uma lista para armazenar as partes não vazias da string
+  const partes = [];
+
+  // Adiciona as partes apenas se o valor for maior que zero
+  if (diferencaDias > 0) {
+    partes.push(`${diferencaDias} dias`);
+  }
+  if (restoHoras > 0 || partes.length > 0) { // Exibe horas se houver dias ou horas
+    partes.push(`${restoHoras} horas`);
+  }
+  if (restoMinutos > 0 || partes.length > 0) { // Exibe minutos se houver horas ou minutos
+    partes.push(`${restoMinutos} minutos`);
+  }
+
+  // Junta as partes com vírgulas e retorna a string
+  return partes.join(", ");
+}
+
 function adicionarLinha(tarefa) {
   // Criando estrutura html da tabela
   let linha = document.createElement("tr");
@@ -89,6 +126,7 @@ function adicionarLinha(tarefa) {
   let coluna_descricao = document.createElement("td");
   let coluna_inicio = document.createElement("td");
   let coluna_fim = document.createElement("td");
+  let coluna_duracao = document.createElement("td");
   let coluna_actions = document.createElement("td");
 
   let action1 = document.createElement("button");
@@ -109,6 +147,9 @@ function adicionarLinha(tarefa) {
   coluna_inicio.textContent = formatarData(tarefa.inicio);
   coluna_fim.textContent = formatarData(tarefa.fim);
 
+  let duracao = calcularDuracao(tarefa.inicio, tarefa.fim);
+  coluna_duracao.textContent = duracao; 
+
   action1.textContent = "Editar";
 
   action2.textContent = "Excluir";
@@ -122,6 +163,7 @@ function adicionarLinha(tarefa) {
   linha.appendChild(coluna_descricao);
   linha.appendChild(coluna_inicio);
   linha.appendChild(coluna_fim);
+  linha.appendChild(coluna_duracao);
 
   coluna_actions.appendChild(action1);
   coluna_actions.appendChild(action2);
