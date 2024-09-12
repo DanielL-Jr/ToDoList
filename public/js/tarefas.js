@@ -84,7 +84,7 @@ function adicionarLinha(tarefa) {
   // Preenchendo as informações de cada coluna
   let checkbox = document.createElement("input");
   checkbox.setAttribute("type", "checkbox");
-  checkbox.setAttribute("class", tarefa.id);
+  checkbox.setAttribute("task_id", tarefa.id);
   checkbox.checked = tarefa.feita;
   checkbox.addEventListener("change", () => trocarEstado(checkbox));
   coluna1.appendChild(checkbox);
@@ -140,7 +140,7 @@ function limparTabela(tabela) {
 
 // Altera o status da tarefa no BD
 async function trocarEstado(checkbox) {
-  const id = checkbox.id;
+  const task_id = checkbox.getAttribute("task_id");
   const estado = checkbox.checked;
   await fetch("/tasks", {
     method: "PATCH",
@@ -148,7 +148,7 @@ async function trocarEstado(checkbox) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      id: id,
+      id: task_id,
       estado: estado,
     }),
   })

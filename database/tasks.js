@@ -15,7 +15,7 @@ const lerTarefas = async (user_id) => {
 
 const trocarEstado = async (estado, id) => {
   let { data } = await supabase.from("tasks").select("id").eq("id", id);
-  if (data.length == 0) return { error: "Tarefa não encontrada" };
+  if (!data) return { error: "Tarefa não encontrada" };
   let consulta = await supabase
     .from("tasks")
     .update({ feita: estado })
