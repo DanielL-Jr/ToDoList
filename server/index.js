@@ -17,6 +17,8 @@ app.get("/", (req, res) => {
 
 // Cria uma nova tarefa
 app.post("/tasks", async (req, res) => {
+
+  // Pega os dados da requisição e monta um objeto, ou registro
   const dados = {
     user_id: req.body.user_id,
     inicio: req.body.inicio,
