@@ -72,11 +72,11 @@ function formatarData(data) {
 function adicionarLinha(tarefa) {
   // Criando estrutura html da tabela
   let linha = document.createElement("tr");
-  let coluna1 = document.createElement("td");
-  let coluna2 = document.createElement("td");
-  let coluna3 = document.createElement("td");
-  let coluna4 = document.createElement("td");
-  let coluna5 = document.createElement("td");
+  let coluna_status = document.createElement("td");
+  let coluna_descricao = document.createElement("td");
+  let coluna_inicio = document.createElement("td");
+  let coluna_fim = document.createElement("td");
+  let coluna_actions = document.createElement("td");
 
   let action1 = document.createElement("button");
   let action2 = document.createElement("button");
@@ -87,11 +87,14 @@ function adicionarLinha(tarefa) {
   checkbox.setAttribute("task_id", tarefa.id);
   checkbox.checked = tarefa.feita;
   checkbox.addEventListener("change", () => trocarEstado(checkbox));
-  coluna1.appendChild(checkbox);
+  coluna_status.style.display = "flex";
+  coluna_status.style.justifyContent = "center";
+  coluna_status.style.alignItems = "center";
+  coluna_status.appendChild(checkbox);
 
-  coluna2.textContent = tarefa.descricao;
-  coluna3.textContent = formatarData(tarefa.inicio);
-  coluna4.textContent = formatarData(tarefa.fim);
+  coluna_descricao.textContent = tarefa.descricao;
+  coluna_inicio.textContent = formatarData(tarefa.inicio);
+  coluna_fim.textContent = formatarData(tarefa.fim);
 
   action1.textContent = "Editar";
 
@@ -102,14 +105,14 @@ function adicionarLinha(tarefa) {
   });
 
   // Montando a linha
-  linha.appendChild(coluna1);
-  linha.appendChild(coluna2);
-  linha.appendChild(coluna3);
-  linha.appendChild(coluna4);
+  linha.appendChild(coluna_status);
+  linha.appendChild(coluna_descricao);
+  linha.appendChild(coluna_inicio);
+  linha.appendChild(coluna_fim);
 
-  coluna5.appendChild(action1);
-  coluna5.appendChild(action2);
-  linha.appendChild(coluna5);
+  coluna_actions.appendChild(action1);
+  coluna_actions.appendChild(action2);
+  linha.appendChild(coluna_actions);
 
   // Decisão de em qual tabela adicionar a linha montada
   if (tarefa.feita) {
