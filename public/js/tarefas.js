@@ -14,16 +14,26 @@ function pegarUserId() {
 
 async function cadastrarTarefa() {
   const descricao = document.getElementById("cadastroDescricao");
-  const inicio = document.getElementById("cadastroInicio");
-  const fim = document.getElementById("cadastroFim");
   const status = document.getElementById("cadastroStatus");
   const user_id = pegarUserId();
+
+  const inicio = document.getElementById("cadastroInicio");
+  const fim = document.getElementById("cadastroFim");
+
+  // Convertendo data e hora para UTC
+  const inicioDate = new Date(inicio.value);
+  const fimDate = new Date(fim.value);
+  const inicioUTC = inicioDate.toISOString();
+  const fimUTC = fimDate.toISOString();
+
+  console.log(inicioUTC);
+  console.log(fimUTC);
 
   const dados = {
     user_id: user_id,
     descricao: descricao.value,
-    inicio: inicio.value,
-    fim: fim.value,
+    inicio: inicioUTC,
+    fim: fimUTC,
     status: status.checked,
   };
   await fetch("/tasks", {
@@ -61,11 +71,14 @@ async function deletarTarefa(id) {
 }
 
 function formatarData(data) {
-  const date = new Date(data);
+  // Cria um objeto Date com a string UTC recebida
+  const dataUTC = new Date(data);
 
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  // Obtém as horas e minutos no horário local
+  const hours = String(dataUTC.getHours()).padStart(2, "0");
+  const minutes = String(dataUTC.getMinutes()).padStart(2, "0");
 
+  // Retorna o horário no formato HH:MM no fuso horário local
   return `${hours}:${minutes}`;
 }
 
@@ -122,6 +135,7 @@ function adicionarLinha(tarefa) {
   }
 }
 
+// Limpa a tabela antes de fazer uma nova consulta para atualizar a tabela
 function limparTabelas() {
   // Seleciona as tabelas pelo ID
   const tabelaTarefasPendentes = document.getElementById(
