@@ -5,6 +5,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const tasks = require("../database/tasks");
+const users = require("../database/users");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
@@ -17,7 +19,6 @@ app.get("/", (req, res) => {
 
 // Cria uma nova tarefa
 app.post("/tasks", async (req, res) => {
-
   // Pega os dados da requisição e monta um objeto, ou registro
   const dados = {
     user_id: req.body.user_id,
@@ -26,8 +27,8 @@ app.post("/tasks", async (req, res) => {
     descricao: req.body.descricao,
     status: req.body.status,
   };
-  const {error} = await tasks.criarTarefa(dados);
-  if(error){
+  const { error } = await tasks.criarTarefa(dados);
+  if (error) {
     res.status(500).send(`Erro ao cadastrar tarefa: ${error}`);
   }
   res.status(201).send("Nova Tarefa Cadastrada com Sucesso!");
@@ -82,5 +83,24 @@ app.delete("/tasks/:id", async (req, res) => {
     res.status(200).send(`Tarefa Deletada com Sucesso!`);
   }
 });
+
+app.post("/users", async (req, res) => {
+  // Monta um registro com as informações da requisição
+  const dados = {
+    name: req.body.name,
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    birthdate: req.body.birthdate,
+  };
+
+  const { error } = await users.criarUsuario(dados);
+
+  if (error) {
+    res.status(500).send(`Erro ao criar usuário: ${error}`);
+  }
+  res.status(201).send(`Usuário criado com sucesso`);
+});
+
 
 app.listen(8080, () => console.log("Rodando servidor na porta 8080"));
