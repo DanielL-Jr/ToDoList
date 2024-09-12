@@ -6,7 +6,7 @@ dotenv.config();
 
 const tasks = require("../database/tasks");
 const users = require("../database/users");
-const bcrypt = require("bcrypt");
+const jwt = require("../database/jwt");
 
 const app = express();
 
@@ -102,5 +102,29 @@ app.post("/users", async (req, res) => {
   res.status(201).send(`Usuário criado com sucesso`);
 });
 
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Espera que o token esteja no formato "Bearer TOKEN"
 
+  if (token == null) return res.status(401).send('Token não fornecido');
+
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) return res.status(403).send('Token inválido');
+
+    req.user = user;
+    next();
+  });
+};
+
+app.post("/users/login", async (req, res) => {
+  const {email, password} = req.body;
+
+  const senhaCorreta = await users.verificarSenha(email, password);
+  if(!senhaCorreta) res.status(401).send("Credenciais incorretas");
+
+  const user = await users.selecionarPorEmail(email);
+  const token = jwt.gerarToken(user.id);
+
+  res.status(200).json(token);
+})
 app.listen(8080, () => console.log("Rodando servidor na porta 8080"));

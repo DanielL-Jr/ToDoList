@@ -51,6 +51,12 @@ const selecionarPorEmail = async (email) => {
   }
 };
 
+const verificarSenha = async (email, password) => {
+  const user = await selecionarPorEmail(email);
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (isMatch) return true;
+  else return false;
+};
 
 const alterarUsuario = async () => {};
 
@@ -61,6 +67,7 @@ const deletarUsuario = async () => {};
 module.exports = {
   criarUsuario,
   selecionarPorEmail,
+  verificarSenha,
   alterarUsuario,
   alterarSenha,
   deletarUsuario,
