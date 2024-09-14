@@ -6,19 +6,38 @@ dotenv.config();
 
 const tasks = require("../database/tasks");
 const users = require("../database/users");
-const jwt = require("../database/jwt");
+const jwt = require("jsonwebtoken");
+const jsonwebtoken = require("../database/jwt");
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+// Redireciona da raiz para login caso não esteja autenticado
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/html/login.html"));
+  const token = req.cookies.authToken;
+
+  if (token == null) res.redirect("/login");
+
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) res.redirect("/login");
+
+    req.user = user;
+    res.redirect("/tarefas")
+  });
 });
 
 app.get("/tarefas", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/html/tarefas.html"));
+    res.sendFile(path.join(__dirname, "../public/html/tarefas.html"));
+});
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/html/login.html"));
 });
 
 // Cria uma nova tarefa
@@ -106,29 +125,21 @@ app.post("/users", async (req, res) => {
   res.status(201).send(`Usuário criado com sucesso`);
 });
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Espera que o token esteja no formato "Bearer TOKEN"
-
-  if (token == null) return res.status(401).send('Token não fornecido');
-
-  jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).send('Token inválido');
-
-    req.user = user;
-    next();
-  });
-};
-
 app.post("/users/login", async (req, res) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
   const senhaCorreta = await users.verificarSenha(email, password);
-  if(!senhaCorreta) res.status(401).send("Credenciais incorretas");
+  if (!senhaCorreta) res.status(401).send("Credenciais incorretas");
 
   const user = await users.selecionarPorEmail(email);
-  const token = jwt.gerarToken(user.id);
+  const token = jsonwebtoken.gerarToken(user.id);
 
-  res.status(200).json(token);
-})
+  res.cookie("authToken", token, {
+    httpOnly: true, // O cookie não pode ser acessado pelo JavaScript (protege contra XSS)
+    sameSite: "strict", // Protege contra CSRF (impede envio de cookies entre sites diferentes)
+    maxAge: 7200000, // Tempo de expiração do cookie (2 horas, em milissegundos)
+  });
+  console.log("Login bem-sucedido");
+  res.status(200).send("Login bem-sucedido");
+});
 app.listen(8080, () => console.log("Rodando servidor na porta 8080"));

@@ -9,7 +9,7 @@ formularioCadastro.addEventListener("submit", () => {
 
 function pegarUserId() {
   // Provisório, ainda não tem autenticação
-  return 2;
+  return 6;
 }
 
 async function cadastrarTarefa() {
