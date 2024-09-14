@@ -28,12 +28,27 @@ app.get("/", (req, res) => {
     if (err) res.redirect("/login");
 
     req.user = user;
-    res.redirect("/tarefas")
+    res.redirect("/tarefas");
   });
 });
 
-app.get("/tarefas", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/html/tarefas.html"));
+// Middleware
+const autenticarUsuario = (req, res, next) => {
+  const token = req.cookies.authToken;
+
+  if (token == null) return res.status(401).send("Token inválido");
+
+  const authenticatedToken = jsonwebtoken.verificarToken(token);
+  if (authenticatedToken == null) {
+    return res.status(401).send("Token inválido");
+  } else {
+    req.user_id = authenticatedToken.user_id;
+    next();
+  }
+};
+
+app.get("/tarefas", autenticarUsuario, (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/html/tarefas.html"));
 });
 
 app.get("/login", (req, res) => {
@@ -41,10 +56,10 @@ app.get("/login", (req, res) => {
 });
 
 // Cria uma nova tarefa
-app.post("/tasks", async (req, res) => {
+app.post("/tasks", autenticarUsuario, async (req, res) => {
   // Pega os dados da requisição e monta um objeto, ou registro
   const dados = {
-    user_id: req.body.user_id,
+    user_id: req.user_id,
     inicio: req.body.inicio,
     fim: req.body.fim,
     descricao: req.body.descricao,
@@ -58,8 +73,8 @@ app.post("/tasks", async (req, res) => {
 });
 
 // Retorna todas as tarefas de um user
-app.get("/tasks/:user_id", async (req, res) => {
-  const { user_id } = req.params;
+app.get("/tasks", autenticarUsuario, async (req, res) => {
+  const user_id = req.user_id;
   const { data, error } = await tasks.lerTarefas(user_id);
   if (error) {
     res.status(500).send(`Erro ao consultar tabela: ${error}`);
@@ -69,7 +84,7 @@ app.get("/tasks/:user_id", async (req, res) => {
 });
 
 // Atualiza qualquer atributo de uma tarefa
-app.put("/tasks", async (req, res) => {
+app.put("/tasks", autenticarUsuario, async (req, res) => {
   const tarefa = {
     id: req.body.id,
     inicio: req.body.inicio,
@@ -86,7 +101,7 @@ app.put("/tasks", async (req, res) => {
 });
 
 // Altera o status de uma tarefa
-app.patch("/tasks", async (req, res) => {
+app.patch("/tasks", autenticarUsuario, async (req, res) => {
   const { estado, id } = req.body;
   const { error } = await tasks.trocarEstado(estado, id);
   if (error) {
@@ -97,7 +112,7 @@ app.patch("/tasks", async (req, res) => {
 });
 
 // Deleta uma única tarefa
-app.delete("/tasks/:id", async (req, res) => {
+app.delete("/tasks/:id", autenticarUsuario, async (req, res) => {
   const { id } = req.params;
   const { error } = await tasks.deletarTarefa(id);
   if (error) {

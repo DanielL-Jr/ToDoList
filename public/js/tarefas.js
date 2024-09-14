@@ -7,15 +7,9 @@ formularioCadastro.addEventListener("submit", () => {
   cadastrarTarefa();
 });
 
-function pegarUserId() {
-  // Provisório, ainda não tem autenticação
-  return 6;
-}
-
 async function cadastrarTarefa() {
   const descricao = document.getElementById("cadastroDescricao");
   const status = document.getElementById("cadastroStatus");
-  const user_id = pegarUserId();
 
   const inicio = document.getElementById("cadastroInicio");
   const fim = document.getElementById("cadastroFim");
@@ -27,7 +21,6 @@ async function cadastrarTarefa() {
   const fimUTC = fimDate.toISOString();
 
   const dados = {
-    user_id: user_id,
     descricao: descricao.value,
     inicio: inicioUTC,
     fim: fimUTC,
@@ -218,8 +211,7 @@ async function trocarEstado(checkbox) {
 }
 
 async function pegarDados() {
-  const userId = 2;
-  await fetch(`http://localhost:8080/tasks/${userId}`, {
+  await fetch(`http://localhost:8080/tasks`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
