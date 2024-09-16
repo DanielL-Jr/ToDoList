@@ -5,7 +5,6 @@ const criarUsuario = async (user_data) => {
   const saltRounds = 10;
 
   const hashedPassword = await bcrypt.hash(user_data.password, saltRounds);
-  console.log(hashedPassword);
 
   // Inserir hashedPassword no banco de dados
   const consulta = await supabase
@@ -18,15 +17,13 @@ const criarUsuario = async (user_data) => {
         password: hashedPassword,
         birthdate: user_data.birthdate,
       },
-    ])
-    .then(({ error }) => {
-      if (error) {
-        console.error("Erro ao criar usuário:", error);
-      } else {
-        console.log("Usuário criado com sucesso!");
-      }
-    });
+    ]).select();
 
+    if (consulta.error) {
+      console.error("Erro ao criar usuário:", consulta.error);
+    } else {
+      console.log("Usuário criado com sucesso!");
+    }
   return consulta;
 };
 
@@ -34,22 +31,44 @@ const selecionarPorEmail = async (email) => {
   const { data, error } = await supabase
     .from("users")
     .select()
-    .eq("email", email)
-    .single();
+    .eq("email", email);
+
   if (error) {
     // Se houver um erro na consulta, registre o erro e retorne null
     console.error("Erro ao selecionar usuário: ", error);
-    return null;
-  } else if (!data) {
+    return error;
+  } else if (data.length === 0) {
     // Se não houver dados retornados, registre um aviso e retorne null
-    console.warn("Usuário não encontrado.");
+    //console.warn("Usuário não encontrado.");
     return null;
   } else {
     // Caso contrário, retorne os dados do usuário
     console.log("Usuário selecionado com sucesso.");
-    return data;
+    return data[0]; // Retorna o primeiro resultado
   }
 };
+
+const selecionarPorUsername = async (username) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select()
+    .eq("username", username);
+
+  if (error) {
+    // Se houver um erro na consulta, registre o erro e retorne null
+    console.error("Erro ao selecionar usuário: ", error);
+    return error;
+  } else if (data.length === 0) {
+    // Se não houver dados retornados, registre um aviso e retorne null
+    //console.warn("Usuário não encontrado.");
+    return null;
+  } else {
+    // Caso contrário, retorne os dados do único usuário encontrado
+    console.log("Usuário selecionado com sucesso.");
+    return data[0]; // Retorne o único resultado encontrado
+  }
+};
+
 
 const verificarSenha = async (email, password) => {
   const user = await selecionarPorEmail(email);
@@ -67,6 +86,7 @@ const deletarUsuario = async () => {};
 module.exports = {
   criarUsuario,
   selecionarPorEmail,
+  selecionarPorUsername,
   verificarSenha,
   alterarUsuario,
   alterarSenha,

@@ -55,6 +55,10 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/html/login.html"));
 });
 
+app.get("/cadastro", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/html/cadastro.html"));
+});
+
 // Cria uma nova tarefa
 app.post("/tasks", autenticarUsuario, async (req, res) => {
   // Pega os dados da requisição e monta um objeto, ou registro
@@ -132,10 +136,10 @@ app.post("/users", async (req, res) => {
     birthdate: req.body.birthdate,
   };
 
-  const { error } = await users.criarUsuario(dados);
+  const consulta = await users.criarUsuario(dados);
 
-  if (error) {
-    res.status(500).send(`Erro ao criar usuário: ${error}`);
+  if (consulta.error) {
+    res.status(500).send(`Erro ao criar usuário: ${consulta.error}`);
   }
   res.status(201).send(`Usuário criado com sucesso`);
 });
@@ -156,5 +160,20 @@ app.post("/users/login", async (req, res) => {
   });
   console.log("Login bem-sucedido");
   res.status(200).send("Login bem-sucedido");
+});
+
+app.post("/users/verify", async (req, res) => {
+  const username = req.body.username;
+  const email = req.body.email;
+  let user = await users.selecionarPorUsername(username);
+  const data = {};
+  if (user) {
+    data.username = "Indisponível";
+  }
+  user = await users.selecionarPorEmail(email);
+  if (user) {
+    data.email = "Indisponível";
+  }
+  res.status(200).json(data);
 });
 app.listen(8080, () => console.log("Rodando servidor na porta 8080"));
