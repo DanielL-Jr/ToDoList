@@ -22,13 +22,13 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   const token = req.cookies.authToken;
 
-  if (token == null) res.redirect("/login");
+  if (token == null) return res.redirect("/login");
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) res.redirect("/login");
+    if (err) return res.redirect("/login");
 
     req.user = user;
-    res.redirect("/tarefas");
+    return res.redirect("/tarefas");
   });
 });
 
