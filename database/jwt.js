@@ -13,7 +13,7 @@ const verificarToken = (token) => {
     const decoded = jwt.verify(token, SECRET_KEY);
 
     // Token é válido, e você pode acessar os dados nele
-    console.log("Token verificado com sucesso:", decoded);
+    //console.log("Token verificado com sucesso:", decoded);
 
     return decoded; // Retorna o conteúdo decodificado do token
   } catch (error) {

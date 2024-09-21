@@ -6,6 +6,17 @@ formularioCadastro.addEventListener("submit", () => {
   event.preventDefault();
   cadastrarTarefa();
 });
+function limparFormulario(){
+  const descricao = document.getElementById("cadastroDescricao");
+  const dataInicio = document.getElementById("cadastroInicio");
+  const dataFim = document.getElementById("cadastroFim");
+  const status = document.getElementById("cadastroStatus");
+
+  descricao.value = "";
+  dataInicio.value = "";
+  dataFim.value = "";
+  status.checked = false;
+}
 
 async function cadastrarTarefa() {
   const descricao = document.getElementById("cadastroDescricao");
@@ -40,6 +51,7 @@ async function cadastrarTarefa() {
     .catch((error) => {
       console.error(error);
     });
+  limparFormulario();
   limparTabelas();
   await pegarDados();
 }

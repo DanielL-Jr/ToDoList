@@ -161,7 +161,7 @@ app.post("/users/login", async (req, res) => {
     maxAge: 7200000, // Tempo de expiração do cookie (2 horas, em milissegundos)
   });
   console.log("Login bem-sucedido");
-  res.status(200).send("Login bem-sucedido");
+  res.status(200).redirect("/");
 });
 
 app.post("/users/verify", async (req, res) => {
