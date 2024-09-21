@@ -17,13 +17,14 @@ const criarUsuario = async (user_data) => {
         password: hashedPassword,
         birthdate: user_data.birthdate,
       },
-    ]).select();
+    ])
+    .select();
 
-    if (consulta.error) {
-      console.error("Erro ao criar usuário:", consulta.error);
-    } else {
-      console.log("Usuário criado com sucesso!");
-    }
+  if (consulta.error) {
+    console.error("Erro ao criar usuário:", consulta.error);
+  } else {
+    console.log("Usuário criado com sucesso!");
+  }
   return consulta;
 };
 
@@ -43,7 +44,7 @@ const selecionarPorEmail = async (email) => {
     return null;
   } else {
     // Caso contrário, retorne os dados do usuário
-    console.log("Usuário selecionado com sucesso.");
+    //console.log("Usuário selecionado com sucesso.");
     return data[0]; // Retorna o primeiro resultado
   }
 };
@@ -69,10 +70,9 @@ const selecionarPorUsername = async (username) => {
   }
 };
 
-
-const verificarSenha = async (email, password) => {
-  const user = await selecionarPorEmail(email);
+const verificarSenha = async (user, password) => {
   const isMatch = await bcrypt.compare(password, user.password);
+
   if (isMatch) return true;
   else return false;
 };

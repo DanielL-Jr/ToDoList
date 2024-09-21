@@ -147,10 +147,12 @@ app.post("/users", async (req, res) => {
 app.post("/users/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const senhaCorreta = await users.verificarSenha(email, password);
-  if (!senhaCorreta) res.status(401).send("Credenciais incorretas");
-
   const user = await users.selecionarPorEmail(email);
+  if(user == null) return res.status(404).send("Credenciais incorretas");
+
+  const senhaCorreta = await users.verificarSenha(user, password);
+  if (!senhaCorreta) return res.status(401).send("Credenciais incorretas");
+
   const token = jsonwebtoken.gerarToken(user.id);
 
   res.cookie("authToken", token, {

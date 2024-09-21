@@ -19,7 +19,7 @@ async function fazerLogin() {
       password: password.value,
     }),
   })
-    .then((response) => response.json())
+    .then((response) => response.text())
     .then((token) => {
       console.log(token);
       localStorage.setItem("authToken", token);
