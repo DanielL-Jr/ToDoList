@@ -9,6 +9,7 @@ async function fazerLogin() {
   const email = document.getElementById("email");
   const password = document.getElementById("password");
 
+  // Requisição feita por JavaScript
   await fetch("/users/login", {
     method: "POST",
     headers: {
@@ -19,10 +20,13 @@ async function fazerLogin() {
       password: password.value,
     }),
   })
-    .then((response) => response.text())
-    .then((token) => {
-      console.log(token);
-      localStorage.setItem("authToken", token);
+    .then((response) => {
+      if (response.ok) {
+        // Redireciona manualmente no frontend
+        window.location.href = "/tarefas";
+      } else {
+        response.text().then((text) => alert(text));
+      }
     })
     .catch((error) => {
       console.error(error);

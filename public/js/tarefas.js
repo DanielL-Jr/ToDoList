@@ -2,11 +2,18 @@ const tabelaTarefasPedentes = document.getElementById("tabelaTarefasPendentes");
 const tabelaTarefasFeitas = document.getElementById("tabelaTarefasFeitas");
 
 const formularioCadastro = document.getElementById("formAdicionarTarefa");
+formularioCadastro.setAttribute("tipo", "cadastrar");
 formularioCadastro.addEventListener("submit", () => {
   event.preventDefault();
-  cadastrarTarefa();
+  const botao = document.getElementById("btnSubmit");
+  if (botao.value == "Adicionar") {
+    cadastrarTarefa();
+  } else {
+    const task_id = formularioCadastro.getAttribute("task_id");
+    atualizarTarefa(task_id);
+  }
 });
-function limparFormulario(){
+function limparFormulario() {
   const descricao = document.getElementById("cadastroDescricao");
   const dataInicio = document.getElementById("cadastroInicio");
   const dataFim = document.getElementById("cadastroFim");
@@ -54,6 +61,115 @@ async function cadastrarTarefa() {
   limparFormulario();
   limparTabelas();
   await pegarDados();
+}
+
+async function atualizarTarefa(task_id) {
+  const descricao = document.getElementById("cadastroDescricao");
+  const status = document.getElementById("cadastroStatus");
+
+  const inicio = document.getElementById("cadastroInicio");
+  const fim = document.getElementById("cadastroFim");
+
+  // Convertendo data e hora para UTC
+  const inicioDate = new Date(inicio.value);
+  const fimDate = new Date(fim.value);
+  const inicioUTC = inicioDate.toISOString();
+  const fimUTC = fimDate.toISOString();
+
+  const tarefa = {
+    id: task_id,
+    descricao: descricao.value,
+    inicio: inicioUTC,
+    fim: fimUTC,
+    status: status.checked,
+  };
+
+  await fetch("/tasks", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(tarefa),
+  })
+    .then((response) => response.text())
+    .then(async (data) => {
+      console.log(data);
+      formCadastrar();
+      limparTabelas();
+      await pegarDados();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+// Função para converter o valor para o formato yyyy-MM-ddThh:mm
+function formatarParaDatetimeLocal(data) {
+  const date = new Date(data); // Cria um objeto Date a partir da string
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function formEditar(task_id) {
+  const titulo = document.getElementById("tituloTarefa");
+  const botao = document.getElementById("btnSubmit");
+  formularioCadastro.setAttribute("tipo", "editar");
+  formularioCadastro.setAttribute("task_id", task_id);
+
+  titulo.textContent = "Editar Tarefa";
+  botao.value = "Editar";
+
+  // Seleciona a linha (tr) com base no atributo task_id
+  const tr = document.querySelector(`tr[task="${task_id}"]`);
+
+  // Seleciona todas as tds dentro da tr
+  const tds = tr.querySelectorAll("td");
+
+  // Seleciona todos os campos do formulário
+  const descricao = document.getElementById("cadastroDescricao");
+  const inicio = document.getElementById("cadastroInicio");
+  const fim = document.getElementById("cadastroFim");
+  const status = document.getElementById("cadastroStatus");
+
+  // Itera sobre todas as tds
+  tds.forEach((td) => {
+    // Acessa o conteúdo de cada td
+    const coluna = td.getAttribute("data-coluna");
+
+    switch (coluna) {
+      case "Descricao":
+        descricao.value = td.textContent;
+        break;
+      case "Inicio":
+        inicio.value = td.getAttribute("inicio");
+        break;
+      case "Fim":
+        fim.value = td.getAttribute("fim");
+        break;
+      case "Checkbox":
+        const checkbox = td.querySelector("input");
+        status.checked = checkbox.checked;
+        break;
+    }
+  });
+}
+
+function formCadastrar() {
+  
+  const titulo = document.getElementById("tituloTarefa");
+  const botao = document.getElementById("btnSubmit");
+  
+  formularioCadastro.setAttribute("tipo", "cadastrar");
+  formularioCadastro.setAttribute("task_id", "");
+
+  titulo.textContent = "Cadastrar Tarefa";
+  botao.value = "Adicionar";
+  limparFormulario();
 }
 
 async function deletarTarefa(id) {
@@ -113,10 +229,12 @@ function calcularDuracao(inicio, fim) {
   if (diferencaDias > 0) {
     partes.push(`${diferencaDias} dias`);
   }
-  if (restoHoras > 0 || partes.length > 0) { // Exibe horas se houver dias ou horas
+  if (restoHoras > 0 || partes.length > 0) {
+    // Exibe horas se houver dias ou horas
     partes.push(`${restoHoras} horas`);
   }
-  if (restoMinutos > 0 || partes.length > 0) { // Exibe minutos se houver horas ou minutos
+  if (restoMinutos > 0 || partes.length > 0) {
+    // Exibe minutos se houver horas ou minutos
     partes.push(`${restoMinutos} minutos`);
   }
 
@@ -127,6 +245,8 @@ function calcularDuracao(inicio, fim) {
 function adicionarLinha(tarefa) {
   // Criando estrutura html da tabela
   let linha = document.createElement("tr");
+  linha.setAttribute("task", tarefa.id);
+
   let coluna_status = document.createElement("td");
   let coluna_descricao = document.createElement("td");
   let coluna_inicio = document.createElement("td");
@@ -143,24 +263,39 @@ function adicionarLinha(tarefa) {
   checkbox.setAttribute("task_id", tarefa.id);
   checkbox.checked = tarefa.feita;
   checkbox.addEventListener("change", () => trocarEstado(checkbox));
+  coluna_status.setAttribute("data-coluna", "Checkbox");
   coluna_status.style.display = "flex";
   coluna_status.style.justifyContent = "center";
   coluna_status.style.alignItems = "center";
   coluna_status.appendChild(checkbox);
 
   coluna_descricao.textContent = tarefa.descricao;
+  coluna_descricao.setAttribute("data-coluna", "Descricao");
+
   coluna_inicio.textContent = formatarData(tarefa.inicio);
+  coluna_inicio.setAttribute(
+    "inicio",
+    formatarParaDatetimeLocal(tarefa.inicio)
+  );
+  coluna_inicio.setAttribute("data-coluna", "Inicio");
+
   coluna_fim.textContent = formatarData(tarefa.fim);
+  coluna_fim.setAttribute("fim", formatarParaDatetimeLocal(tarefa.fim));
+  coluna_fim.setAttribute("data-coluna", "Fim");
 
   let duracao = calcularDuracao(tarefa.inicio, tarefa.fim);
-  coluna_duracao.textContent = duracao; 
+  coluna_duracao.textContent = duracao;
 
   action1.textContent = "Editar";
+  action1.setAttribute("task", tarefa.id);
+  action1.addEventListener("click", () => {
+    formEditar(action1.getAttribute("task"));
+  });
 
   action2.textContent = "Excluir";
-  action2.setAttribute("class", tarefa.id);
+  action2.setAttribute("task", tarefa.id);
   action2.addEventListener("click", () => {
-    deletarTarefa(action2.className);
+    deletarTarefa(action2.getAttribute("task"));
   });
 
   // Montando a linha

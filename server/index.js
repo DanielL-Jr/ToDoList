@@ -32,7 +32,8 @@ app.get("/", (req, res) => {
   });
 });
 
-// Middleware
+// Middleware, autorização antes de cada requisição
+// Executa e continua, por isso é middle, que é no meio
 const autenticarUsuario = (req, res, next) => {
   const token = req.cookies.authToken;
 
@@ -42,6 +43,7 @@ const autenticarUsuario = (req, res, next) => {
   if (authenticatedToken == null) {
     return res.status(401).send("Token inválido");
   } else {
+    // Altera a requisição que o navegador mandou
     req.user_id = authenticatedToken.user_id;
     next();
   }
@@ -59,9 +61,11 @@ app.get("/cadastro", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/html/cadastro.html"));
 });
 
+// CRUD Tarefas
 // Cria uma nova tarefa
 app.post("/tasks", autenticarUsuario, async (req, res) => {
   // Pega os dados da requisição e monta um objeto, ou registro
+  // O que dita o usuário da tarefa é o req.user_id que o middleware alterou
   const dados = {
     user_id: req.user_id,
     inicio: req.body.inicio,
@@ -126,6 +130,8 @@ app.delete("/tasks/:id", autenticarUsuario, async (req, res) => {
   }
 });
 
+// Criar usuário
+// Não precisa de auth
 app.post("/users", async (req, res) => {
   // Monta um registro com as informações da requisição
   const dados = {
@@ -148,22 +154,27 @@ app.post("/users/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await users.selecionarPorEmail(email);
+
+  // Usuário não existe
   if(user == null) return res.status(404).send("Credenciais incorretas");
 
+  // Senha incorreta
   const senhaCorreta = await users.verificarSenha(user, password);
   if (!senhaCorreta) return res.status(401).send("Credenciais incorretas");
 
+  // Cria token de autenticação
   const token = jsonwebtoken.gerarToken(user.id);
 
+  // Guarda no cookie do client/frontend
   res.cookie("authToken", token, {
     httpOnly: true, // O cookie não pode ser acessado pelo JavaScript (protege contra XSS)
     sameSite: "strict", // Protege contra CSRF (impede envio de cookies entre sites diferentes)
     maxAge: 7200000, // Tempo de expiração do cookie (2 horas, em milissegundos)
   });
-  console.log("Login bem-sucedido");
-  res.status(200).redirect("/");
+  res.status(200).send("Login bem-sucedido");
 });
 
+// Verifica se os dados do cadastro de conta são válidos
 app.post("/users/verify", async (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
