@@ -2,7 +2,7 @@
   "name": "todolist",
   "version": "1.0.0",
   "description": "Uma página para organizar tarefas e sequência de dias",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
     "test": "nodemon server/index.js"
   },
