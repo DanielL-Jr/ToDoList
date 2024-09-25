@@ -358,7 +358,7 @@ async function trocarEstado(checkbox) {
 }
 
 async function pegarDados() {
-  await fetch(`http://localhost:8080/tasks`, {
+  await fetch(`/tasks`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
